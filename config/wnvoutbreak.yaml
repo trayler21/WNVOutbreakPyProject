@@ -1,0 +1,5 @@
+remote_url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRX4dscJkWPQ0k_ztex23ZvEnBnoCfo1-WPqlV9iMvgfWhnO8QrRjbMebytyglID1cIGeeBz69lo7Kh/pub?output=csv'
+proj_dir: 'C:\Users\Owner\Documents\ArcGIS\Projects\WestNileOutbreak\'
+data_format: 'GSheet'
+geocoder_prefix_url: 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address='
+geocoder_suffix_url: '&benchmark=2020&format=json'
