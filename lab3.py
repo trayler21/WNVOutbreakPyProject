@@ -7,18 +7,17 @@ from etl.GSheetsEtl import GSheetsEtl
 def setup():
     with open('config/wnvoutbreak.yaml') as f:
         config_dict = yaml.load(f, Loader=yaml.FullLoader)
-        return config_dict
 
+    logging.basicConfig(filename=f"{config_dict.get('proj_dir')}wnv.log",
+                        filemode="w",
+                        level=logging.DEBUG)
 
-logging.basicConfig(filename=f"{config_dict.get('proj_dir')}wnv.log",
-                    filemode="w",
-                    level=logging.DEBUG)
+    logging.debug('This is a debug statement')
+    logging.info('This will get logged to a file')
+    logging.warning('This is a Warning')
+    logging.error('This is an error!')
 
-logging.debug('This is a debug statement')
-logging.info('This will get logged to a file')
-logging.warning('This is a Warning')
-logging.error('This is an error!')
-
+    return config_dict
 
 # Define the ETL.
 def etl():
