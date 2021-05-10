@@ -35,7 +35,6 @@ def buffer(layer, dist):
     units = " feet"
     dist = dist + units
     output_layer = layer + "_buf"
-
     fc_list = arcpy.ListFeatureClasses()
     for fc in fc_list:
         if output_layer == fc:
@@ -80,7 +79,6 @@ def main():
 
     for layer in layer_list:
         print(layer)
-
         # Ask user for buffer distance input.
         dist = input("Please type in a buffer distance between 1000-5000 feet: ")
         bufferlayer = buffer(layer, dist)
@@ -125,6 +123,9 @@ if __name__ == '__main__':
     global config_dict
     config_dict = setup()
     print(config_dict)
-    etl()
+
+etl()
 
 main()
+
+export_map()

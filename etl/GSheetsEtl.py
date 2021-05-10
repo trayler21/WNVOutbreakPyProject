@@ -5,13 +5,31 @@ from etl.SpatialEtl import SpatialEtl
 
 
 class GSheetsEtl(SpatialEtl):
+    """
+    GSheetsEtl performs an Extract, Transform, and Load, or ETL, defined from the SpatialETL.py file, to
+    process using an URL to a Google spreadsheet.
+    The spreadsheet must contain an address and zip code column.
 
+    Parameters:
+    config_dict (dictionary): A dictionary containing a remote_url key to the Google
+    spreadsheet and web geocoding service.
+    """
+    # A dictionary of configuration keys and values.
     config_dict = None
 
     def __init__(self, config_dict):
+        """
+        A configuration dictionary can be incredibly useful in programming. It allows use of a
+        short-cut of sorts, rather than requiring the input of complex and often long paths.
+        :param config_dict:
+        """
         super().__init__(config_dict)
 
     def extract(self):
+        """
+        Extracting data from a Google spreadsheet to transform it and save it to a local file.
+        :return:
+        """
         print("Extracting addresses from Google form spreadsheet...")
 
         r = requests.get(self.config_dict.get('remote_url'))
@@ -21,6 +39,11 @@ class GSheetsEtl(SpatialEtl):
             output_file.write(data)
 
     def transform(self):
+        """
+        Transforming the extracted data by performing some task(s) in order to clean up, standardize, verify, sort,
+        or otherwise change to improve data quality or function.
+        :return:
+        """
         print("Add City, State")
 
         transformed_file = open(f"{self.config_dict.get('proj_dir')}new_addresses.csv", "w")
@@ -42,6 +65,11 @@ class GSheetsEtl(SpatialEtl):
         transformed_file.close()
 
     def load(self):
+        """
+        Loading provides the destination for the transformed data and stores it as defined by the program.
+        :return:
+        """
+
         # Description: Creates a point feature class from input table
         # Set environment settings
         arcpy.env.workspace = f"{self.config_dict.get('proj_dir')}WestNileOutbreak.gdb"
@@ -60,6 +88,11 @@ class GSheetsEtl(SpatialEtl):
         print(arcpy.GetCount_management(out_feature_class))
 
     def process(self):
+        """
+        The process definition uses the self parameter in order to point to each individual tool. GSheetsEtl.py is
+        referring to SpatialEtl.py, which is described by importing the SpatialEtl.py file by this file.
+        :return:
+        """
         self.extract()
         self.transform()
         self.load()
