@@ -15,8 +15,7 @@ def setup():
             config_dict = yaml.load(f, Loader=yaml.FullLoader)
 
         logging.basicConfig(filename=f"{config_dict.get('proj_dir')}wnv.log",
-                        filemode='w',
-                        level=logging.DEBUG)
+                            filemode='w', level=logging.DEBUG)
 
         logging.debug('This is a debug statement!')
         logging.info('This will get logged to a file!')
@@ -87,45 +86,6 @@ def intersect(inter_list):
         print(f"Error in intersect! {e}")
 
 
-# Define and set the spatial reference.
-def set_spatial_reference():
-    """
-    The spatial reference method will allow the program to set the project and it's map to the
-    spatial reference of choice, in this case, the NAD 1983 State Plane Colorado North projected coordinate system.
-    :param: aprx
-    :return: projection as defined
-    """
-    try:
-        logging.debug("Starting set_spatial_reference Method...")
-        map_doc = aprx.listMaps()[0]
-        # https://www.spatialreference.org/ref/esri/102653/
-        state_plane_noco = arcpy.SpatialReference(102653)
-        map_doc.spatialReference = state_plane_noco
-    #    except Exception as e:
-    #        print(f"Error in set_spatial_reference {e}")
-        logging.debug("Ending set-spatial_reference Method!")
-    except Exception as e:
-        print(f"Error in set_spatial_reference! {e}")
-
-
-# Define the export map call.
-def export_map():
-    """
-    The export map method allows the program to export the map, including requesting user input in
-    order to add a subtitle to the map title.
-    :return: export
-    """
-    try:
-        lyt = aprx.listLayouts()[0]
-        subtitle = input("Please provide a subtitle for the West Nile Virus Outbreak map: ")
-        for el in lyt.listElements():
-            print(el.name)
-            if "Title" in el.name:
-                el.text = el.text + subtitle
-    except Exception as e:
-        print(f"Error in export_map! {e}")
-
-
 # Define the main function.
 def main():
     """
@@ -137,7 +97,8 @@ def main():
         logging.debug("Starting West Nile Virus Simulation...")
         arcpy.env.overwriteOutput = True
         arcpy.env.workspace = f"{config_dict.get('proj_dir')}WestNileOutbreak.gdb"
-        aprx = arcpy.mp.ArcGISProject(r"C:\Users\Owner\Documents\ArcGIS\Projects\WestNileOutbreak\WestNileOutbreak.aprx")
+        aprx = arcpy.mp.ArcGISProject(r"C:\Users\Owner\Documents\ArcGIS\Projects\WestNileOutbreak"
+                                      r"\WestNileOutbreak.aprx")
         for map in aprx.listMaps():
             print("Map: " + map.name)
             for lyr in map.listLayers():
@@ -154,16 +115,14 @@ def main():
     resultsgeodatabase = r"C:\Users\Owner\Documents\ArcGIS\Projects\WestNileOutbreak\WestNileOutbreak.gdb\\"
     arcpy.env.workspace = resultsgeodatabase
 
-    featureclass = arcpy.ListFeatureClasses()
-
     for layer in layer_list:
         print(layer)
 
         # Ask user for buffer distance input.
         dist = input("Please type in a buffer distance between 1000-5000 feet: ")
-        bufferlayer = buffer(layer, dist)
+        buffer_layer = buffer(layer, dist)
 
-    featureclass = arcpy.ListFeatureClasses()
+    feature_class = arcpy.ListFeatureClasses()
 
     inter_list = ["Mosquito_Larval_Sites_buf", "Wetlands_Regulatory_buf", "OSMP_Properties_buf",
                   "Lakes_and_Reservoirs_buf"]
@@ -185,8 +144,45 @@ def main():
     print("Erase layer created.")
 
 
+# Define and set the spatial reference.
+def set_spatial_reference(aprx):
+    """
+    The spatial reference method will allow the program to set the project and it's map to the
+    spatial reference of choice, in this case, the NAD 1983 State Plane Colorado North projected coordinate system.
+    :param aprx: ArcPRO project object
+    :return: projection as defined
+    """
+    try:
+        logging.debug("Starting set_spatial_reference Method...")
+        map_doc = aprx.listMaps()[0]
+        # https://www.spatialreference.org/ref/esri/102653/
+        state_plane_noco = arcpy.SpatialReference(102653)
+        map_doc.spatialReference = state_plane_noco
+        logging.debug("Ending set-spatial_reference Method!")
+    except Exception as e:
+        print(f"Error in set_spatial_reference! {e}")
+
+
+# Define the export map call.
+def export_map(aprx):
+    """
+    The export map method allows the program to export the map, including requesting user input in
+    order to add a subtitle to the map title.
+    :return: export
+    """
+    try:
+        lyt = aprx.listLayouts()[0]
+        subtitle = input("Please provide a subtitle for the West Nile Virus Outbreak map: ")
+        for el in lyt.listElements():
+            print(el.name)
+            if "Title" in el.name:
+                el.text = el.text + subtitle
+    except Exception as e:
+        print(f"Error in export_map! {e}")
+
+
 #  Set up target addresses layer.
-def target_addresses():
+def target_addresses(aprx):
     """
     This targets the addresses within the Boulder residential addresses layer that are due to receive
     spraying services for mosquito virus mitigation.
@@ -194,7 +190,7 @@ def target_addresses():
     """
     try:
         target_features = "Boulder_addresses"
-        join_features = output_final_analysis
+        join_features = "spatial_join"
         out_feature_class = "Target_addresses"
         arcpy.SpatialJoin_analysis(target_features, join_features, out_feature_class)
         print("Target addresses layer created.")
@@ -206,13 +202,13 @@ def target_addresses():
         lyr = map_doc.listLayers("output_final_analysis")[0]
 
 # Get the existing symbology.
-    sym = lyr.symbology
+        sym = lyr.symbology
 # Set symbology for output_final_analysis layer.
-    sym.renderer.symbol.color = {'RGB': [255, 0, 0, 100]}
-    sym.renderer.symbol.outlineColor = {'RGB': [0, 0, 0, 100]}
-    lyr.symbology = sym
-    lyr.transparency = 50
-    aprx.save()
+        sym.renderer.symbol.color = {'RGB': [255, 0, 0, 100]}
+        sym.renderer.symbol.outlineColor = {'RGB': [0, 0, 0, 100]}
+        lyr.symbology = sym
+        lyr.transparency = 50
+        aprx.save()
 # def render(output_final_analysis):
 
 
@@ -223,8 +219,10 @@ if __name__ == '__main__':
 
     etl()
 
-    set_spatial_reference()
+    set_spatial_reference(arcpy.mp.ArcGISProject)
 
-    export_map()
+    target_addresses(arcpy.mp.ArcGISProject)
+
+    export_map(arcpy.mp.ArcGISProject)
 
     main()
